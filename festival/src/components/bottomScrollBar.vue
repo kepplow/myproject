@@ -1,87 +1,15 @@
 <template>
   <div class="bottom-scroll-bar">
-    <ul ref="scroll-bar">
-      <li>
+    <ul ref="scroll-bar" @touchstart="handle">
+      <li v-for="(item, index) in datalist" :key="index">
         <b-img
-          src="https://picsum.photos/250/250/?image=59"
+          :src="item.avatar"
           v-bind="mainProps"
           rounded="circle"
           alt="Circle image"
         ></b-img>
         <div class="message">
-          <span class="name">李磊1</span>
-          <span>支付成功！</span>
-        </div>
-      </li>
-      <li>
-        <b-img
-          src="https://picsum.photos/250/250/?image=59"
-          v-bind="mainProps"
-          rounded="circle"
-          alt="Circle image"
-        ></b-img>
-        <div class="message">
-          <span class="name">李磊</span>
-          <span>支付成功！</span>
-        </div>
-      </li>
-      <li>
-        <b-img
-          src="https://picsum.photos/250/250/?image=59"
-          v-bind="mainProps"
-          rounded="circle"
-          alt="Circle image"
-        ></b-img>
-        <div class="message">
-          <span class="name">哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈</span>
-          <span>支付成功！</span>
-        </div>
-      </li>
-      <li>
-        <b-img
-          src="https://picsum.photos/250/250/?image=59"
-          v-bind="mainProps"
-          rounded="circle"
-          alt="Circle image"
-        ></b-img>
-        <div class="message">
-          <span class="name">哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈</span>
-          <span>支付成功！</span>
-        </div>
-      </li>
-      <li>
-        <b-img
-          src="https://picsum.photos/250/250/?image=59"
-          v-bind="mainProps"
-          rounded="circle"
-          alt="Circle image"
-        ></b-img>
-        <div class="message">
-          <span class="name">李磊1</span>
-          <span>支付成功！</span>
-        </div>
-      </li>
-      <li>
-        <b-img
-          src="https://picsum.photos/250/250/?image=59"
-          v-bind="mainProps"
-          rounded="circle"
-          alt="Circle image"
-        ></b-img>
-        <div class="message">
-          <span class="name">李磊</span>
-          <span>支付成功！</span>
-        </div>
-      </li>
-      <li>
-        <b-img
-          src="https://picsum.photos/250/250/?image=59"
-          v-bind="mainProps"
-          rounded="circle"
-          alt="Circle image"
-        ></b-img>
-        <div class="message">
-          <span class="name">哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈</span>
+          <span class="name">{{item.uname}}</span>
           <span>支付成功！</span>
         </div>
       </li>
@@ -92,18 +20,29 @@
 <script>
 export default {
   name: "bottomScrollBar",
+  props: ['config'],
   data() {
     return {
       timeId: "",
+      datalist: [],
       mainProps: { width: 36, height: 36, class: "m1" }
     };
   },
-  methods: {},
-  mounted() {
+  methods: {
+    handle (eve){
+      eve.preventDefault();
+    }
+  },
+  beforeMount() {
+    this.datalist = [...this.config]
+    for (let i = 0; i < 3; i++) {
+      this.datalist.push({...this.config[i]})
+    }
+    
     // 开始滚动，每隔两秒滚动一次
     this.timeId = setInterval(() => {
       let scrollBar = this.$refs["scroll-bar"];
-      if (scrollBar.offsetTop < -138) {
+      if (scrollBar.offsetTop < -46 * (this.config.length-1)) {
         scrollBar.style.transition = "none";
         scrollBar.style.top = "0px";
         setTimeout(() => {

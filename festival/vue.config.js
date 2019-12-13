@@ -1,8 +1,8 @@
 module.exports = {
     devServer: {
         proxy: {
-            'http://mkt.sccenze.cn': {
-              target: 'http://mkt.sccenze.cn',
+            'http://wx.sccenze.cn': {
+              target: 'http://wx.sccenze.cn',
               ws: true,
               secure: true,
               changeOrigin: true,

@@ -5,17 +5,10 @@
     </div>
     <div class="content">
       <ul>
-        <li>
+        <li v-for="(item, index) in prizeList" :key="index">
           <div class="item">
-            <b-img></b-img>
-            <div class="item-info">京东100元购物卡</div>
-            <b-button>使用</b-button>
-          </div>
-        </li>
-        <li>
-          <div class="item">
-            <b-img></b-img>
-            <div class="item-info">狗东10000000元购物卡</div>
+            <b-img :src="item.image"></b-img>
+            <div class="item-info">{{item.name}}</div>
             <b-button>使用</b-button>
           </div>
         </li>
@@ -28,7 +21,19 @@
 export default {
   name: "myPrize",
   data() {
-    return {};
+    return {
+      prizeList: []
+    };
+  },
+  mounted () {
+    this.$axios({
+      methed: 'get',
+      url: 'api/activity/userinfo/myprize'
+    }).then(res => {
+      if (res.data.code == '1000') {
+        this.prizeList = [...res.data.data]
+      }
+    })
   }
 };
 </script>

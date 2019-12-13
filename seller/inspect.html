@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>核销</title>
+    <style>
+        * {
+            padding: 0;
+            margin: 0;
+            box-sizing: border-box;
+        }
+        html,body {
+            width: 100%;
+            min-height: 100%;
+            overflow-x: hidden;
+        }
+        body {
+            background-color: #F2F2F2;
+        }
+        .header {
+            background-color: #7329FE88;
+            padding: 20px 20px 10px 20px;
+        }
+        .header .search {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .header .search .tip {
+            color: #fff;
+            font-size: 18px;
+            margin-right: 10px;
+            line-height: 30px;
+        }
+        .header .search input {
+            flex: 1;
+            height: 30px;
+            border: 1px solid #fff;
+            border-radius: 30px;
+            background-color: transparent;
+            text-indent: 10px;
+            outline: none;
+            color: #fff;
+        }
+        .header .search .scan {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            margin-left: 5px;
+            background: url(./images/scan@2x.png);
+            background-size: 100% 100%;
+        }
+        .header ul.details {
+            margin-top: 10px;
+            list-style: none;
+            padding: 10px;
+            background-color: #fff;
+            font-size: 14px;
+            border-radius: 5px;
+        }
+        .header ul.details li {
+            height: 28px;
+            padding-top: 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(128,128,128,.3);
+        }
+        .header ul.details li:nth-last-child(1) {
+            border: none;
+        }
+        .header ul.details li span:nth-of-type(1) {
+            color: black;
+        }
+        .header ul.details li span:nth-of-type(2) {
+            color: #808080;
+            vertical-align: bottom;
+        }
+        .header .btn {
+            width: 130px;
+            height: 40px;
+            line-height: 40px;
+            text-align: center;
+            color: #fff;
+            font-size: 18px;
+            background-color: #7329FE;
+            border-radius: 40px;
+            margin: 10px auto 0 auto;
+        }
+        .history .title {
+            font-size: 15px;
+            color: #000;
+            margin: 20px 0 10px 5px;
+        }
+        .history ul.orders {
+            padding: 0 10px;
+        }
+        .history ul.orders li {
+            color: #000;
+            background-color: #fff;
+            padding: 10px;
+            border-radius: 7px;
+            margin-bottom: 10px;
+        }
+        .history ul.orders li .number {
+            height: 34px;
+            line-height: 34px;
+            font-size: 14px;
+            border-bottom: 1px solid rgba(128,128,128,.3);
+        }
+        .history ul.orders li .details {
+            display: flex;
+            align-items: center;
+            height: 50px;
+        }
+        .history ul.orders li .details .img {
+            width: 30px;
+            height: 30px;
+            background: url(./images/order-img@2x.png) no-repeat;
+            background-size: 100% 100%;
+            border-radius: 50%;
+            margin-right: 15px;
+        }
+        .history ul.orders li .details .text {
+            font-size: 12px;
+            color: #808080;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="search">
+            <span class="tip">核销单号</span>
+            <input type="text" placeholder="请输入单号" value="">
+            <span class="scan"></span>
+        </div>
+        <ul class="details">
+            <li><span>订单编号</span><span>1111111111111</span></li>
+            <li><span>客户名称</span><span>哈哈哈哈哈</span></li>
+            <li><span>手机号</span><span>15999999999</span></li>
+            <li><span>核销日期</span><span>2019-12-09</span></li>
+        </ul>
+        <div class="btn">确认使用</div>
+    </div>
+    <div class="history">
+        <div class="title">核销历史</div>
+        <ul class="orders">
+            <li>
+                <div class="number">订单编号: <span>11111111111</span></div>
+                <div class="details">
+                    <div class="img"></div>
+                    <div class="text">
+                        <div>客户名称: <span>哈哈哈哈</span></div>
+                        <div>核销时间: <span>2019-12-20 10:30</span></div>
+                    </div>
+                </div>
+            </li>
+            <li>
+                <div class="number">订单编号: <span>11111111111</span></div>
+                <div class="details">
+                    <div class="img"></div>
+                    <div class="text">
+                        <div>客户名称: <span>哈哈哈哈</span></div>
+                        <div>核销时间: <span>2019-12-20 10:30</span></div>
+                    </div>
+                </div>
+            </li>
+            <li>
+                <div class="number">订单编号: <span>11111111111</span></div>
+                <div class="details">
+                    <div class="img"></div>
+                    <div class="text">
+                        <div>客户名称: <span>哈哈哈哈</span></div>
+                        <div>核销时间: <span>2019-12-20 10:30</span></div>
+                    </div>
+                </div>
+            </li>
+            <li>
+                <div class="number">订单编号: <span>11111111111</span></div>
+                <div class="details">
+                    <div class="img"></div>
+                    <div class="text">
+                        <div>客户名称: <span>哈哈哈哈</span></div>
+                        <div>核销时间: <span>2019-12-20 10:30</span></div>
+                    </div>
+                </div>
+            </li>
+            <li>
+                <div class="number">订单编号: <span>11111111111</span></div>
+                <div class="details">
+                    <div class="img"></div>
+                    <div class="text">
+                        <div>客户名称: <span>哈哈哈哈</span></div>
+                        <div>核销时间: <span>2019-12-20 10:30</span></div>
+                    </div>
+                </div>
+            </li>
+            <li>
+                <div class="number">订单编号: <span>11111111111</span></div>
+                <div class="details">
+                    <div class="img"></div>
+                    <div class="text">
+                        <div>客户名称: <span>哈哈哈哈</span></div>
+                        <div>核销时间: <span>2019-12-20 10:30</span></div>
+                    </div>
+                </div>
+            </li>
+        </ul>
+    </div>
+</body>
+</html>

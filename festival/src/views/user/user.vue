@@ -82,15 +82,27 @@ export default {
       nickname: '游客'
     };
   },
-  mounted() {
+  beforeMount() {
     this.$axios({
-      methods: "get",
-      url:
-        `https://api.weixin.qq.com/cgi-bin/user/info?access_token=${localStorage.getItem('access_token')}&openid=ohmvowDMYkLA-02ADTm4BF91ojrU&lang=zh_CN`
+      method: "POST",
+      url: `/api/activity/userinfo/user`
     }).then(res => {
-      this.headimgurl = res.data.headimgurl
-      this.nickname = res.data.nickname
-      // localStorage.setItem('access_token', res.data)
+      console.log(res)
+      let tmpData = res.data
+      if (tmpData.code == 1000 && tmpData.data) {
+        this.headimgurl = tmpData.data.avatar
+        this.nickname = tmpData.data.nickname
+      } else {
+        this.$bvModal.msgBoxOk(res.msg, {
+            title: '提示！',
+            size: 'sm',
+            buttonSize: 'sm',
+            okVariant: 'success',
+            headerClass: 'p-2 border-bottom-0',
+            footerClass: 'p-2 border-top-0',
+            centered: true
+        })
+      }
     });
   }
 };

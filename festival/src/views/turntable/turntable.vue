@@ -9,17 +9,17 @@
         <div class="time-down-box">
           <p>活动结束倒计时</p>
           <div class="d-h-m-s">
-            <span>99</span> 天
-            <span>23</span> 时
-            <span>59</span> 分
-            <span>59</span> 秒
+            <span>{{timeDown.day}}</span> 天
+            <span>{{timeDown.hours}}</span> 时
+            <span>{{timeDown.minutes}}</span> 分
+            <span>{{timeDown.second}}</span> 秒
           </div>
         </div>
         <div class="plate-box">
           <span
             ref="plate"
             :class="{plate: true, 'action': false}"
-            :style="`transition: all 3s;transform: rotate(${-90 - 360/rotateItems.length/2}deg);`"
+            :style="`transition: none;transform: rotate(${-90 - 360/rotateItems.length/2}deg);`"
             @transitionend="rotateEnd"
           >
             <div v-for="(item, index) in rotateItems" :key="index">
@@ -59,7 +59,7 @@
               </div>
             </div>
           </span>
-          <span class="start" @click="startRotate"></span>
+          <span class="start" @click="getTarget"></span>
         </div>
         <b-button class="my-prize" @click="$router.push('/myPrize')">我的奖品</b-button>
       </div>
@@ -70,8 +70,12 @@
     </section>
 
     <footer>
-      <div>商务合作：岑泽网络科技营销平台</div>
-      <div>版权所有：岑泽网络科技营销平台</div>
+      <div>
+        <a :href="'tel:' + componey.value">{{componey.name}}</a>
+      </div>
+      <div>
+        <a :href="'tel:' + contact.value">{{contact.name}}</a>
+      </div>
     </footer>
 
     <!-- <b-container class="bottom-btn" fluid>
@@ -79,11 +83,11 @@
         <b-col class="poster-btn" @click="showPoser">海报</b-col>
         <b-col class="participate-btn" @click="showForm">报名有礼</b-col>
       </b-row>
-    </b-container> -->
+    </b-container>-->
 
     <section class="tools">
       <sideBtnList @click="handleClick" :config="sideBtnConfig"></sideBtnList>
-      <bottom-scroll-bar></bottom-scroll-bar>
+      <bottom-scroll-bar v-if="bottomScrollConfig.length >= 3" :config="bottomScrollConfig"></bottom-scroll-bar>
       <redPackets v-if="showRedPackets" @done="readingDone" :config="redPacketsConfig"></redPackets>
       <div class="poster" @click="showPoser">海报</div>
     </section>
@@ -109,7 +113,7 @@
           <b-img class="pic"></b-img>
           <div class="tip">
             恭喜获得
-            <span>京东100元抵用券</span>
+            <span>{{targetName}}</span>
           </div>
           <b-button @click="$router.push('/myPrize')">查看奖品</b-button>
         </div>
@@ -124,7 +128,7 @@
         <div class="poster" v-if="modalsVisible.poster">
           <p class="tip">长按图片保存海报</p>
           <div>
-            <b-img src="../../assets/images/codeImg.png" width="200" height="300"></b-img>
+            <b-img :src="posterImg" width="200" height="300"></b-img>
           </div>
           <b-button @click="hide()">关闭</b-button>
         </div>
@@ -149,6 +153,7 @@
 </template>
 
 <script>
+import wx from "weixin-js-sdk";
 import bannerSwiper from "../../components/bannerSwiper";
 import sideBtnList from "../../components/sideBtnList";
 import bottomScrollBar from "../../components/bottomScrollBar";
@@ -158,9 +163,23 @@ export default {
   name: "turntable",
   data() {
     return {
+      targetName: "",
+      did: null,
+      timer: null,
+      posterImg: "",
+      // 页脚
+      componey: { name: "", value: "" },
+      contact: { name: "", value: "" },
+      // 倒计时
+      timeDown: {
+        day: 8,
+        hours: 0,
+        minutes: 0,
+        second: 0
+      },
       // 红包配置
       redPacketsConfig: {
-        countStop: 30
+        countStop: 60
       },
       // 侧边栏配置
       sideBtnConfig: {
@@ -170,18 +189,15 @@ export default {
       },
       // 红包是否显示
       showRedPackets: true,
+      // 富文本
       boardItems: [
         {
           header: "活动规则",
-          content: "内容内容内容内容内容内容内容内容内容内容"
+          content: ""
         },
         {
-          header: "活动规则",
-          content: "内容内容内容内容内容内容内容内容内容内容"
-        },
-        {
-          header: "活动规则",
-          content: "内容内容内容内容内容内容内容内容内容内容"
+          header: "商家介绍",
+          content: ""
         }
       ],
       // 转盘奖品
@@ -197,32 +213,10 @@ export default {
         {
           title: "二等奖",
           image: "https://picsum.photos/1024/400/?image=41"
-        },
-        {
-          title: "三等奖",
-          image: "https://picsum.photos/1024/400/?image=41"
-        },
-        {
-          title: "四等奖",
-          image: "https://picsum.photos/1024/400/?image=41"
-        },
-        {
-          title: "三等奖",
-          image: "https://picsum.photos/1024/400/?image=41"
-        },
-        {
-          title: "四等奖",
-          image: "https://picsum.photos/1024/400/?image=41"
-        },
-        {
-          title: "四等奖",
-          image: "https://picsum.photos/1024/400/?image=41"
-        },
-        {
-          title: "三等奖",
-          image: "https://picsum.photos/1024/400/?image=41"
         }
       ],
+      // 底部滚动数据
+      bottomScrollConfig: [],
       // 提交的表单数据
       submitForm: {
         userName: "",
@@ -252,15 +246,139 @@ export default {
     board,
     redPackets
   },
+  beforeMount() {
+    // wx.config({
+    //   debug: true, // 开启调试模式,调用的所有api的返回值会在客户端alert出来，若要查看传入的参数，可以在pc端打开，参数信息会通过log打出，仅在pc端时才会打印。
+    //   appId: "", // 必填，公众号的唯一标识
+    //   timestamp: "", // 必填，生成签名的时间戳
+    //   nonceStr: "", // 必填，生成签名的随机串
+    //   signature: "", // 必填，签名
+    //   jsApiList: [] // 必填，需要使用的JS接口列表
+    // });
+  },
   mounted() {
-    this.craetCanvas();
+    this.init();
+  },
+  beforeDestroy() {
+    clearInterval(this.timer);
+    this.timer = null;
   },
   methods: {
+    init() {
+      this.did = this.$route.query.did || null;
+      // wx.ready(function() {
+      //   //需在用户可能点击分享按钮前就先调用
+      //   wx.updateAppMessageShareData({
+      //     title: "大爷来玩啊", // 分享标题
+      //     desc: "大转盘啊", // 分享描述
+      //     link: "http://www.baidu.com", // 分享链接，该链接域名或路径必须与当前页面对应的公众号JS安全域名一致
+      //     imgUrl: "", // 分享图标
+      //     success: function() {
+      //       // 设置成功
+      //       console.log('大爷再来啊');
+      //     }
+      //   });
+      // });
+      this.$axios({
+        method: "post",
+        url: "/api/activity/dzp/dzp",
+        data: {
+          id: this.did
+        }
+      }).then(res => {
+        if (res.data.code == "1000") {
+          // 页脚
+          this.componey = res.data.componey;
+          this.contact = res.data.contact;
+          let { data } = res.data;
+          console.log(data);
+          // 红包
+          this.showRedPackets = !data.read;
+          // 海报
+          this.posterImg = data.img;
+          // 侧边栏
+          this.sideBtnConfig.phone = data.bz_leader_mobile;
+          this.sideBtnConfig.music = data.musicfile;
+          this.sideBtnConfig.qrCode = data.qrcode;
+          this.boardItems[0].content = data.content;
+          // 底部滚动
+          this.bottomScrollConfig = [...data.info];
+          console.log(this.bottomScrollConfig);
+          // 奖品
+          this.rotateItems = [];
+          data.prize.forEach(ele => {
+            this.rotateItems.push({
+              id: ele.id,
+              name: ele.name,
+              title: ele.level,
+              image: ele.image
+            });
+          });
+          this.$nextTick(() => {
+            this.craetCanvas();
+          });
+          // 倒计时
+          this.deadLine(data.endtime * 1000);
+          this.swiperImages = data.images.split(",");
+        }
+      });
+    },
+    // 倒计时
+    deadLine(endtime) {
+      const day = 1000 * 60 * 60 * 24;
+      const now = new Date().getTime();
+      this.timeDown.day = (endtime - now) / day;
+      this.timeDown.hours = ((endtime - now) % day) / (1000 * 60 * 60);
+      this.timeDown.minutes =
+        ((endtime - now) % (1000 * 60 * 60)) / (1000 * 60);
+      this.timeDown.second = ((endtime - now) % (1000 * 60)) / 1000;
+      for (let item in this.timeDown) {
+        this.timeDown[item] = (this.timeDown[item] + "")
+          .slice(0, 2)
+          .replace(".", "");
+      }
+      this.timer = setInterval(() => {
+        if (this.timeDown.second <= 0) {
+          if (this.timeDown.minutes <= 0) {
+            if (this.timeDown.hours <= 0) {
+              this.timeDown.day--;
+              this.timeDown.hours = 23;
+            }
+            this.timeDown.hours--;
+            this.timeDown.minutes = 59;
+          }
+          this.timeDown.minutes--;
+          this.timeDown.second = 59;
+        }
+        this.timeDown.second--;
+        if (
+          this.timeDown.second <= 0 &&
+          this.timeDown.minutes <= 0 &&
+          this.timeDown.hours <= 0 &&
+          this.timeDown.day <= 0
+        ) {
+          clearInterval(this.timer);
+          this.timer = null;
+          this.$emit("timeEnd");
+        }
+      }, 1000);
+    },
     // 阅读完成
     readingDone() {
-      this.changeModal("redPackets");
-      this.$bvModal.show("modal-turntable");
-      this.showRedPackets = false;
+      this.$axios({
+        method: "post",
+        url: "api/activity/dzp/read",
+        data: {
+          id: this.did
+        }
+      }).then(res => {
+        console.log(res);
+        if (res.data.code == "1000") {
+          this.changeModal("redPackets");
+          this.$bvModal.show("modal-turntable");
+          this.showRedPackets = false;
+        }
+      });
     },
     craetCanvas() {
       this.rotateItems.forEach((ele, index) => {
@@ -282,16 +400,43 @@ export default {
         ctx.fill();
       });
     },
+    // 获取到奖品
+    getTarget() {
+      let id = this.did;
+      let targetid = null;
+      this.$axios({
+        method: "post",
+        url: "api/activity/dzp/prize",
+        data: {
+          id
+        }
+      }).then(res => {
+        console.log(res);
+        if (res.data.code == "1000") {
+          this.targetName = res.data.data.prize;
+          targetid = res.data.data.prizeid;
+          this.startRotate(targetid);
+        } else if (res.data.code == "1002") {
+          this.$bvModal.msgBoxOk(res.data.msg, {
+            title: "提示！",
+            size: "sm",
+            buttonSize: "sm",
+            okVariant: "success",
+            headerClass: "p-2 border-bottom-0",
+            footerClass: "p-2 border-top-0",
+            centered: true
+          });
+        }
+      });
+    },
     // 开始旋转
-    startRotate() {
+    startRotate(targetid) {
       let plate = this.$refs.plate; // 操作的圆盘
       let angle = -90 - 360 / this.rotateItems.length / 2; //初始角度
-      let target = 2; // 将要中的奖品号
-
       plate.style.transition = "all 3s";
       // 查找与中奖号码相对应的旋转角度
       this.rotateItems.forEach((ele, index) => {
-        if (target == index) {
+        if (targetid == ele.id) {
           angle += 360 * 5 - (index * 360) / this.rotateItems.length;
           plate.style.transform = `rotate(${angle}deg)`;
           return;
@@ -502,6 +647,10 @@ export default {
     color: #fb9f20;
     font-size: 12px;
     margin-top: 10px;
+    a {
+      color: #fb9f20;
+      text-decoration: none;
+    }
   }
 }
 /deep/#modal-turntable {

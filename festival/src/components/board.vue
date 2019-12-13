@@ -1,7 +1,7 @@
 <template>
   <div class="board">
     <div class="title">{{config.header}}</div>
-    <p>{{config.content}}</p>
+    <p v-html="config.content"></p>
   </div>
 </template>
 
