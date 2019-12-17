@@ -47,13 +47,17 @@
 
     <section class="tools">
       <sideBtnList @click="handleClick" :config="sideBtnConfig"></sideBtnList>
-      <bottom-scroll-bar></bottom-scroll-bar>
+      <bottom-scroll-bar v-if="bottomScrollConfig.length >= 3" :config="bottomScrollConfig"></bottom-scroll-bar>
       <redPackets v-if="showRedPackets" @done="readingDone" :config="redPacketsConfig"></redPackets>
     </section>
 
     <footer>
-      <div>商务合作：岑泽网络科技营销平台</div>
-      <div>版权所有：岑泽网络科技营销平台</div>
+      <div>
+        <a :href="'tel:' + componey.value">{{componey.name}}</a>
+      </div>
+      <div>
+        <a :href="'tel:' + contact.value">{{contact.name}}</a>
+      </div>
     </footer>
 
     <b-modal id="modal-coupon" centered>
@@ -109,6 +113,11 @@ export default {
   name: "coupon",
   data() {
     return {
+      // 页脚
+      componey: { name: "", value: "" },
+      contact: { name: "", value: "" },
+      // 底部滚动数据
+      bottomScrollConfig: [],
       // 提交的表单信息
       submitForm: {
         userName: "",
@@ -124,7 +133,7 @@ export default {
       // 侧边栏配置
       sideBtnConfig: {
         music: "",
-        phone: 18042119961,
+        phone: 11111111111,
         qrCode: ""
       },
       companyInfo: {
@@ -157,6 +166,25 @@ export default {
     redPackets
   },
   methods: {
+    // 初始化数据
+    init() {
+      
+      this.$axios({
+        method: "post",
+        url: "/api/activity/coupon/coupon",
+        data: {
+          id: 1
+        }
+      }).then(res => {
+        console.log(res);
+        if (res.data && res.data.code == 1000) {
+          let data = res.data.data;
+          this.sideBtnConfig.music = data.musicfile;
+          this.sideBtnConfig.phone = data.bz_leader_mobile;
+          this.sideBtnConfig.qrCode = data.qrcode;
+        }
+      });
+    },
     // 阅读完成
     readingDone() {
       this.changeModal("redPackets");
@@ -182,6 +210,9 @@ export default {
       }
       this.modalsVisible[target] = true;
     }
+  },
+  mounted() {
+    this.init();
   }
 };
 </script>

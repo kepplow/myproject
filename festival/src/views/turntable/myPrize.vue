@@ -30,6 +30,7 @@ export default {
       methed: 'get',
       url: 'api/activity/userinfo/myprize'
     }).then(res => {
+      console.log(res)
       if (res.data.code == '1000') {
         this.prizeList = [...res.data.data]
       }
