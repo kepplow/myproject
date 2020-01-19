@@ -2,77 +2,13 @@
   <div class="order-expansion">
     <div class="head"></div>
     <ul class="list">
-      <li>
-        <img src="../../assets/images/turntable.png" />
+      <li v-for="(item, index) in orders" :key="index">
+        <img :src="item.avatar" />
         <div class="details">
-          <div class="name">nickname</div>
-          <div class="time">2019-12-09 10:18</div>
+          <div class="name">{{item.uname}}</div>
+          <div class="time">{{item.time}}</div>
         </div>
-        <div class="money">返现5元</div>
-      </li>
-      <li>
-        <img src="../../assets/images/turntable.png" />
-        <div class="details">
-          <div class="name">nickname</div>
-          <div class="time">2019-12-09 10:18</div>
-        </div>
-        <div class="money">返现5元</div>
-      </li>
-      <li>
-        <img src="../../assets/images/turntable.png" />
-        <div class="details">
-          <div class="name">nickname</div>
-          <div class="time">2019-12-09 10:18</div>
-        </div>
-        <div class="money">返现5元</div>
-      </li>
-      <li>
-        <img src="../../assets/images/turntable.png" />
-        <div class="details">
-          <div class="name">nickname</div>
-          <div class="time">2019-12-09 10:18</div>
-        </div>
-        <div class="money">返现5元</div>
-      </li>
-      <li>
-        <img src="../../assets/images/turntable.png" />
-        <div class="details">
-          <div class="name">nickname</div>
-          <div class="time">2019-12-09 10:18</div>
-        </div>
-        <div class="money">返现5元</div>
-      </li>
-      <li>
-        <img src="../../assets/images/turntable.png" />
-        <div class="details">
-          <div class="name">nickname</div>
-          <div class="time">2019-12-09 10:18</div>
-        </div>
-        <div class="money">返现5元</div>
-      </li>
-      <li>
-        <img src="../../assets/images/turntable.png" />
-        <div class="details">
-          <div class="name">nickname</div>
-          <div class="time">2019-12-09 10:18</div>
-        </div>
-        <div class="money">返现5元</div>
-      </li>
-      <li>
-        <img src="../../assets/images/turntable.png" />
-        <div class="details">
-          <div class="name">nickname</div>
-          <div class="time">2019-12-09 10:18</div>
-        </div>
-        <div class="money">返现5元</div>
-      </li>
-      <li>
-        <img src="../../assets/images/turntable.png" />
-        <div class="details">
-          <div class="name">nickname</div>
-          <div class="time">2019-12-09 10:18</div>
-        </div>
-        <div class="money">返现5元</div>
+        <div class="money">返现{{item.remoney}}元</div>
       </li>
     </ul>
   </div>
@@ -82,7 +18,25 @@
 export default {
   name: "orderExpansion",
   data() {
-    return {};
+    return {
+      orders: []
+    };
+  },
+  methods: {
+    init () {
+      this.$axios({
+        url: '/api/activity/userinfo/reorders',
+        method: 'post',
+      }).then(res => {
+        if (res.data.code == '1000') {
+          let data = res.data.data;
+          this.orders = data
+        }
+      })
+    }
+  },
+  mounted () {
+    this.init()
   }
 };
 </script>

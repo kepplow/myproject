@@ -8,19 +8,19 @@
       <div class="purchase-count-bg">
         <purchase-count :configs="purchaseConfig"></purchase-count>
       </div>
-      <remaining-time :config="remainingConfig" @timeEnd="timeEnd"></remaining-time>
+      <remaining-time v-if="remainingConfig.deadline != 0" :config="remainingConfig" @timeEnd="timeEnd"></remaining-time>
     </section>
 
     <section class="tip">
       <text-tip :config="detailsConfig"></text-tip>
     </section>
 
-    <section class="details">
+    <!-- <section class="details">
       <b-img src="https://picsum.photos/1024/400/?image=41" fluid alt="Responsive image"></b-img>
       <b-img thumbnail fluid src="https://picsum.photos/250/250/?image=54" alt="Image 1"></b-img>
       <b-img thumbnail fluid src="https://picsum.photos/250/250/?image=58" alt="Image 2"></b-img>
       <b-img thumbnail fluid src="https://picsum.photos/250/250/?image=59" alt="Image 3"></b-img>
-    </section>
+    </section>-->
 
     <b-container class="bottom-btn" fluid>
       <b-row>
@@ -31,14 +31,25 @@
 
     <section class="tools">
       <sideBtnList @click="handleClick" :config="sideBtnConfig"></sideBtnList>
-      <bottom-scroll-bar></bottom-scroll-bar>
+      <bottom-scroll-bar v-if="bottomScrollConfig.length >= 3" :config="bottomScrollConfig"></bottom-scroll-bar>
       <redPackets v-if="showRedPackets" @done="readingDone" :config="redPacketsConfig"></redPackets>
     </section>
 
     <footer>
-      <baidu-map class="map" :center="mapConfig.center" :zoom="mapConfig.zoom" @ready="mapReady" @click="gotoMap"></baidu-map>
-      <div>商务合作：岑泽网络科技营销平台</div>
-      <div>版权所有：岑泽网络科技营销平台</div>
+      <baidu-map
+        class="map"
+        v-if="mapConfig.center.lng && mapConfig.center.lat"
+        :center="mapConfig.center"
+        :zoom="mapConfig.zoom"
+        @ready="mapReady"
+        @click="gotoMap"
+      ></baidu-map>
+      <div>
+        <a :href="'tel:' + componey.value">{{componey.name}}</a>
+      </div>
+      <div>
+        <a :href="'tel:' + contact.value">{{contact.name}}</a>
+      </div>
     </footer>
 
     <b-modal id="modal-index" centered>
@@ -68,7 +79,7 @@
         <div class="poster" v-if="modalsVisible.poster">
           <p class="tip">长按图片保存海报</p>
           <div>
-            <b-img src="../../assets/images/codeImg.png" width="200" height="300"></b-img>
+            <b-img :src="posterImg" width="200" height="300"></b-img>
           </div>
           <b-button @click="hide()">关闭</b-button>
         </div>
@@ -76,16 +87,16 @@
         <div class="userInfo" v-if="modalsVisible.userInfo">
           <div class="form">
             <p class="tip">请留下您的联系方式以便我们及时联系您</p>
-            <b-form-input class="user-name" v-model="submitForm.userName" placeholder="请输入姓名"></b-form-input>
+            <b-form-input class="user-name" v-model="submitForm.username" placeholder="请输入姓名"></b-form-input>
             <b-form-input
               class="phone"
-              v-model="submitForm.phone"
+              v-model="submitForm.mobile"
               type="tel"
               maxlength="11"
               placeholder="请输入电话号码"
             ></b-form-input>
           </div>
-          <b-button class="pay">支付100元抢购</b-button>
+          <b-button class="pay" @click="goPay">立即抢购</b-button>
         </div>
       </template>
     </b-modal>
@@ -100,14 +111,19 @@ import sideBtnList from "../../components/sideBtnList";
 import textTip from "./components/textTip";
 import bottomScrollBar from "../../components/bottomScrollBar";
 import redPackets from "../../components/redPackets";
+import wx from "weixin-js-sdk";
 export default {
   name: "index",
   data() {
     return {
+      did: "",
       mapConfig: {
-        center: { lng: 109.45744048529967, lat: 36.49771311230842 },
+        center: { lng: 0, lat: 0 },
         zoom: 13
       },
+      // 页脚
+      componey: { name: "", value: "" },
+      contact: { name: "", value: "" },
       // 红包配置
       redPacketsConfig: {
         countStop: 0
@@ -124,17 +140,18 @@ export default {
       },
       // 活动结束倒计时
       remainingConfig: {
-        deadline: 1577776304000,
-        count: 1000,
+        deadline: 0,
+        count: 0,
         pay: 0
       },
       // 红包是否显示
       showRedPackets: false,
       // 提交的表单信息
       submitForm: {
-        userName: "",
-        phone: "",
-        number: 1
+        username: "",
+        mobile: "",
+        type: "",
+        id: ""
       },
       // 显示的模态框
       modalsVisible: {
@@ -146,6 +163,10 @@ export default {
       },
       // 轮播图片
       swiperImages: [],
+      // 底部弹幕
+      bottomScrollConfig: [],
+      // 海报
+      posterImg: "",
       // 购买数量配置
       purchaseConfig: {
         looks: 100000,
@@ -169,12 +190,61 @@ export default {
     redPackets
   },
   methods: {
-    gotoMap () {
-      location.href = 'http://api.map.baidu.com/marker?location=40.047669,116.313082&title=我在这&content=百度奎科大厦&output=html'
+    goPay() {
+      let that = this;
+      this.$axios({
+        url: "/api/activity/userinfo/order",
+        method: "post",
+        data: this.submitForm
+      }).then(res => {
+        if (res.data.code == "1000") {
+          wx.chooseWXPay({
+            //此方法应放在调用后台统一下单接口成功后回调里面，接口返回  timeStamp，nonceStr，package，paySign等参数
+            timestamp: res.data.timeStamp,
+            nonceStr: res.data.nonceStr,
+            package: res.data.package,
+            signType: res.data.signType,
+            paySign: res.data.paySign,
+            appId: res.data.appId, //此参数可不用
+            success: function(r) {
+              // 支付成功后的回调函数
+              if (r.errMsg == "chooseWXPay:ok") {
+                //支付成功
+                location.reload();
+                // that.$router.push(`/goodsDetails?type=1&id=${id}`);
+              } else {
+                location.reload(); //支付失败 刷新界面
+              }
+            },
+            cancel: function(r) {
+              //支付取消
+              location.reload();
+            }
+          });
+        } else {
+          this.$bvModal.msgBoxOk(res.data.msg, {
+            title: "提示！",
+            size: "sm",
+            buttonSize: "sm",
+            okVariant: "success",
+            headerClass: "p-2 border-bottom-0",
+            footerClass: "p-2 border-top-0",
+            centered: true
+          });
+        }
+      });
+    },
+    gotoMap() {
+      location.href = `http://api.map.baidu.com/marker?location=${this.mapConfig
+        .center.lng || 0},${this.mapConfig.center.lat ||
+        0}&title=我在这&content=${this.mapConfig.center.bz_name}&output=html`;
     },
     // 初始化地图
     mapReady({ BMap, map }) {
-      var point = new BMap.Point(109.49926175379778, 36.60449676862417);
+      var point = new BMap.Point(
+        this.mapConfig.center.lng,
+        this.mapConfig.center.lat
+      );
       map.centerAndZoom(point, 13);
       var marker = new BMap.Marker(point); // 创建标注
       map.addOverlay(marker); // 将标注添加到地图中
@@ -221,16 +291,24 @@ export default {
       this.modalsVisible[target] = true;
     },
     initData() {
+      this.submitForm.id = this.did =
+        this.$route.query && this.$route.query.id ? this.$route.query.id : "";
+      this.submitForm.type =
+        this.$route.query && this.$route.query.type
+          ? this.$route.query.type
+          : 0;
       let that = this;
       this.$axios({
-        methods: "post",
+        method: "post",
         url: "/api/activity/baoming/getactivity",
         params: {
-          id: 1
+          id: this.did
         }
       }).then(res => {
         if (res.data && res.data.code == "1000") {
           let tmpData = res.data.data;
+          this.componey = res.data.componey;
+          this.contact = res.data.contact;
           that.remainingConfig.deadline = tmpData.endtime * 1000;
           that.remainingConfig.count = tmpData.join_num;
           that.remainingConfig.pay = tmpData.joined_num;
@@ -242,16 +320,60 @@ export default {
           that.purchaseConfig.pay = tmpData.joined_num;
           that.detailsConfig.content = tmpData.content;
           that.detailsConfig.title = tmpData.title;
+          that.purchaseConfig.avatars = tmpData.avatars;
+          that.posterImg = tmpData.posterImg;
           that.redPacketsConfig.countStop = tmpData.hongbao_page_stop;
           that.showRedPackets = true;
+          that.mapConfig.center.lng = tmpData.business.lg
+            ? tmpData.business.lg
+            : that.mapConfig.center.lng;
+          that.mapConfig.center.lat = tmpData.business.la
+            ? tmpData.business.la
+            : that.mapConfig.center.lat;
         } else {
-          alert(res.msg);
+          this.$bvModal.msgBoxOk(res.msg, {
+            title: "提示！",
+            size: "sm",
+            buttonSize: "sm",
+            okVariant: "success",
+            headerClass: "p-2 border-bottom-0",
+            footerClass: "p-2 border-top-0",
+            centered: true
+          });
         }
       });
     }
   },
   mounted() {
     this.initData();
+  },
+  beforeMount() {
+    this.$axios({
+      method: "post",
+      url: "/api/activity/userinfo/js",
+      data: {
+        type: this.$route.query.type,
+        id: this.$route.query.id
+      }
+    }).then(res => {
+      if (res.data && res.data.code == 1000) {
+        var {
+          appId,
+          timestamp,
+          nonceStr,
+          signature,
+          jsApiList
+        } = res.data.data;
+        wx.config({
+          debug: true, // 开启调试模式,调用的所有api的返回值会在客户端alert出来，若要查看传入的参数，可以在pc端打开，参数信息会通过log打出，仅在pc端时才会打印。
+          appId, // 必填，公众号的唯一标识
+          timestamp, // 必填，生成签名的时间戳
+          nonceStr, // 必填，生成签名的随机串
+          signature, // 必填，签名
+          jsApiList // 必填，需要使用的JS接口列表
+        });
+      }
+    }); 
   }
 };
 </script>
@@ -294,6 +416,11 @@ export default {
     color: #fb9f20;
     font-size: 12px;
     margin-top: 10px;
+    div {
+      a {
+        color: #fb9f20;
+      }
+    }
     .map {
       width: 95%;
       margin: 20px auto;
@@ -306,6 +433,9 @@ export default {
   .modal-header,
   .modal-footer {
     display: none;
+  }
+  .modal-dialog {
+    margin: 0!important;
   }
   .modal-content {
     width: auto;

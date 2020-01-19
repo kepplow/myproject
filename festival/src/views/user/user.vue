@@ -22,7 +22,7 @@
             <span class="icon iconfont">&#xe62c;</span>
           </div>
         </li>
-        <li @click="$router.push('/turntable')">
+        <!-- <li @click="$router.push('/turntable')">
           <div class="left">
             <span class="icon"></span>
             <span>参与活动</span>
@@ -30,7 +30,7 @@
           <div class="right">
             <span class="icon iconfont">&#xe62c;</span>
           </div>
-        </li>
+        </li> -->
         <li @click="$router.push('/fans')">
           <div class="left">
             <span class="icon"></span>
@@ -87,7 +87,6 @@ export default {
       method: "POST",
       url: `/api/activity/userinfo/user`
     }).then(res => {
-      console.log(res)
       let tmpData = res.data
       if (tmpData.code == 1000 && tmpData.data) {
         this.headimgurl = tmpData.data.avatar

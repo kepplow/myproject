@@ -1,19 +1,19 @@
 <template>
   <div class="goods-details">
-    <div class="business">商家</div>
+    <div class="business">{{goods.name}}</div>
     <div class="content">
-      <div class="title">活动全场满5减三</div>
-      <div class="time">2019年11月22日 13:10</div>
+      <!-- <div class="title"></div> -->
+      <div class="time">{{goods.createtime}}</div>
       <div class="number">
         序列号:
-        <span>123456</span>
+        <span>{{goods.oid}}</span>
       </div>
       <div class="QR-code">
-        <img src="../../assets/images/codeImg.png"/>
+        <img :src="goods.qcorde" />
       </div>
       <div class="explain">
         说明:
-        <div class="explain-detailes">哈哈哈哈啊哈哈哈哈</div>
+        <div class="explain-detailes" v-html="goods.content"></div>
       </div>
     </div>
   </div>
@@ -23,7 +23,62 @@
 export default {
   name: "goodsDetails",
   data() {
-    return {};
+    return {
+      goods: {
+        name: ''
+      }
+    };
+  },
+  methods: {
+    init() {
+      let that = this;
+      if (this.$route.query.type == "0") {
+        this.$axios({
+          url: "api/activity/userinfo/orderinf",
+          method: "post",
+          data: {
+            id: this.$route.query.id
+          }
+        }).then(res => {
+          if (res.data.code == "1000") {
+            let data = res.data.data;
+            that.goods = data;
+            this.goods.name = data.name;
+            this.time = data.createtime;
+          }
+        });
+      } else if (this.$route.query.type == '1') {
+        this.$axios({
+          url: "/api/activity/userinfo/couponinf",
+          method: "post",
+          data: {
+            id: this.$route.query.id
+          }
+        }).then(res => {
+          if (res.data.code == "1000") {
+            let data = res.data.data;
+            that.goods = data;
+            that.goods.name = data.cname;
+          }
+        });
+      } else if (this.$route.query.type == '2') {
+        this.$axios({
+          url: "api/activity/userinfo/prizeinf",
+          method: "post",
+          data: {
+            id: this.$route.query.id
+          }
+        }).then(res => {
+          if (res.data.code == "1000") {
+            let data = res.data.data;
+            that.goods = data;
+          }
+        });
+      }
+    }
+  },
+  mounted() {
+    this.init();
   }
 };
 </script>
@@ -59,40 +114,40 @@ export default {
       color: #ff4701;
     }
     .number {
+      color: #808080;
+      width: 200px;
+      height: 40px;
+      line-height: 40px;
+      text-align: center;
+      background-color: rgba(128, 128, 128, 0.3);
+      margin: 20px auto;
+      span {
         color: #808080;
-        width: 200px;
-        height: 40px;
-        line-height: 40px;
-        text-align: center;
-        background-color: rgba(128,128,128,.3);
-        margin: 20px auto;
-        span {
-            color: #808080;
-            font-size: 24px;
-            vertical-align: middle;
-        }
+        font-size: 24px;
+        vertical-align: middle;
+      }
     }
     .QR-code {
-        width: 250px;
-        height: 250px;
-        line-height: 250px;
-        border:1px solid rgba(128,128,128,1);
-        text-align: center;
-        margin: 0 auto;
-        img {
-            width: 200px;
-            height: 200px;
-        }
+      width: 250px;
+      height: 250px;
+      line-height: 250px;
+      border: 1px solid rgba(128, 128, 128, 1);
+      text-align: center;
+      margin: 0 auto;
+      img {
+        width: 200px;
+        height: 200px;
+      }
     }
     .explain {
-        margin-top: 30px;
-        font-size: 15px;
-        color: #000;
-        .explain-detailes {
-            padding: 0 40px;
-            color: #808080;
-            font-size: 14px;
-        }
+      margin-top: 30px;
+      font-size: 15px;
+      color: #000;
+      .explain-detailes {
+        padding: 0 40px;
+        color: #808080;
+        font-size: 14px;
+      }
     }
   }
 }

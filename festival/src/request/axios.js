@@ -2,7 +2,7 @@ import axios from 'axios'; // 引入axios
 import app from '../main'
 import qs from 'qs'
 const service = axios.create({
-    baseURL: process.env.NODE_ENV == 'production' ? 'http://26f6x82790.wicp.vip:27640' : 'http://wx.sccenze.cn', // api的base_url
+    baseURL: process.env.NODE_ENV == 'production' ? 'http://wx.sccenze.cn' : 'http://wx.sccenze.cn', // api的base_url
     timeout: 5000 // request timeout
 })
 axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded;charset=UTF-8';

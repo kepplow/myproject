@@ -2,41 +2,16 @@
   <div class="my-coupon">
     <div class="title">我的优惠券</div>
     <ul>
-      <li>
+      <li v-for="(item, index) in coupons" :key="index">
         <div class="left">
-          <div>3元</div>
-          <div>满减券</div>
+          <div>{{parseInt(item.money)}}元</div>
+          <div>{{item.name}}</div>
         </div>
         <div class="center">
-          <div>活动全场</div>
-          <div>满三减五</div>
-          <div>有效期：11.22-11-30</div>
+          <div>{{item.title}}</div>
+          <div>有效期：{{item.starttime.split(' ')[0].replace(/-/g, '.') + '-' + item.endtime.split(' ')[0].replace(/-/g, '.')}}</div>
         </div>
-        <div class="right">立即<br>使用</div>
-      </li>
-      <li>
-        <div class="left">
-          <div>3元</div>
-          <div>满减券</div>
-        </div>
-        <div class="center">
-          <div>活动全场</div>
-          <div>满三减五</div>
-          <div>有效期：11.22-11-30</div>
-        </div>
-        <div class="right">立即<br>使用</div>
-      </li>
-      <li>
-        <div class="left">
-          <div>3元</div>
-          <div>满减券</div>
-        </div>
-        <div class="center">
-          <div>活动全场</div>
-          <div>满三减五</div>
-          <div>有效期：11.22-11-30</div>
-        </div>
-        <div class="right">立即<br>使用</div>
+        <div class="right" @click="$router.push(`/goodsDetails?type=1&id=${item.id}`)">立即<br>使用</div>
       </li>
     </ul>
   </div>
@@ -46,9 +21,26 @@
 export default {
   name: "myCoupon",
   data() {
-    return {};
+    return {
+      coupons: []
+    };
   },
-  methods: {}
+  methods: {
+    init () {
+      this.$axios({
+        url: '/api/activity/userinfo/coupons',
+        method: 'post',
+      }).then(res => {
+        if (res.data.code == '1000') {
+          let data = res.data.data;
+          this.coupons = data;
+        }
+      })
+    }
+  },
+  mounted () {
+    this.init();
+  }
 };
 </script>
 
@@ -98,12 +90,12 @@ export default {
         border-right: 1px solid #808080;
         padding-right: 10px;
         div:nth-of-type(1) {
-          font-size: 30px;
+          font-size: 24px;
           font-weight: bold;
         }
       }
       .center {
-        padding-left: 10px;
+        padding-left: 5px;
         flex: 1;
         color: #FFC942;
         font-size: 12px;

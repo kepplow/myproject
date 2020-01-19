@@ -9,7 +9,7 @@
           <div class="item">
             <b-img :src="item.image"></b-img>
             <div class="item-info">{{item.name}}</div>
-            <b-button>使用</b-button>
+            <b-button @lick="$route.push(`/goodsDetails?type=2&id=${item.id}`)">使用</b-button>
           </div>
         </li>
       </ul>
@@ -30,7 +30,7 @@ export default {
       methed: 'get',
       url: 'api/activity/userinfo/myprize'
     }).then(res => {
-      console.log(res)
+      // console.log(res)
       if (res.data.code == '1000') {
         this.prizeList = [...res.data.data]
       }

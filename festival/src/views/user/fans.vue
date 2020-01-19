@@ -8,32 +8,11 @@
     </div>
     <div class="content">
       <ul>
-        <li>
-          <span class="time">2019-12-09 10:18</span>
+        <li v-for="(item, index) in fans" :key="index">
+          <span class="time">{{item.time}}</span>
           <span>
-            <img src="../../assets/images/turntable.png" />
-            <span class="name">nickname</span>
-          </span>
-        </li>
-        <li>
-          <span class="time">2019-12-09 10:18</span>
-          <span>
-            <img src="../../assets/images/turntable.png" />
-            <span class="name">nickname</span>
-          </span>
-        </li>
-        <li>
-          <span class="time">2019-12-09 10:18</span>
-          <span>
-            <img src="../../assets/images/turntable.png" />
-            <span class="name">nickname</span>
-          </span>
-        </li>
-        <li>
-          <span class="time">2019-12-09 10:18</span>
-          <span>
-            <img src="../../assets/images/turntable.png" />
-            <span class="name">nickname</span>
+            <img :src="item.avatar" />
+            <span class="name">{{item.uname}}</span>
           </span>
         </li>
       </ul>
@@ -45,7 +24,26 @@
 export default {
   name: "fans",
   data() {
-    return {};
+    return {
+      fans: []
+    };
+  },
+  methods: {
+    init () {
+      this.$axios({
+        url: '/api/activity/userinfo/refans',
+        method: 'post'
+      }).then(res => {
+        // console.log(res)
+        if (res.data.code == '1000') {
+          let data = res.data.data;
+          this.fans = data;
+        }
+      })
+    }
+  },
+  mounted () {
+    this.init()
   }
 };
 </script>

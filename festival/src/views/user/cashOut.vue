@@ -11,7 +11,11 @@
       <div class="form">
         <p>
           <span>提现金额</span>
-          <input type="number" v-model.number="count" @change="count = new Number(count).toFixed(2)"/>
+          <input
+            type="number"
+            v-model.number="count"
+            @change="count = new Number(count).toFixed(2)"
+          />
         </p>
         <p>
           <span>提现手续费</span>
@@ -34,7 +38,7 @@
         </div>
         <div v-show="!canOut">输入金额超过收益余额</div>
       </div>
-      <div class="submit">提现</div>
+      <div class="submit" @click="cashOut">提现</div>
     </div>
   </div>
 </template>
@@ -44,19 +48,32 @@ export default {
   name: "cashOut",
   data() {
     return {
-      all: 6000.00,
-      count: 0,
+      all: 6000.0,
+      count: 0
     };
   },
   computed: {
-    service () {
-      return (this.count/500).toFixed(2)
+    service() {
+      return (this.count / 500).toFixed(2);
     },
-    actual () {
-      return (this.count - (this.count/500).toFixed(2)).toFixed(2)
+    actual() {
+      return (this.count - (this.count / 500).toFixed(2)).toFixed(2);
     },
-    canOut () {
-      return this.count > this.all ? false : true
+    canOut() {
+      return this.count > this.all ? false : true;
+    }
+  },
+  methods: {
+    cashOut() {
+      this.$axios({
+        url: "/api/activity/userinfo/apply",
+        method: "post",
+        data: {
+          money: this.count
+        }
+      }).then(res => {
+        // console.log(res);
+      });
     }
   }
 };

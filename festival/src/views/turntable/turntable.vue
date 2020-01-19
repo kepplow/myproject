@@ -232,11 +232,7 @@ export default {
         redPackets: true
       },
       // 轮播图片
-      swiperImages: [
-        require("../../assets/images/banner.jpg"),
-        "https://picsum.photos/1024/480/?image=58",
-        "https://picsum.photos/1024/480/?image=52"
-      ]
+      swiperImages: []
     };
   },
   components: {
@@ -247,11 +243,16 @@ export default {
     redPackets
   },
   beforeMount() {
+    let id =
+      this.$route.query && this.$route.query.id ? this.$route.query.id : 0;
     this.$axios({
       method: "post",
-      url: "/api/activity/userinfo/js"
+      url: "/api/activity/userinfo/js",
+      data: {
+        type: 2,
+        id
+      }
     }).then(res => {
-      console.log(res);
       if (res.data && res.data.code == 1000) {
         var {
           appId,
@@ -284,13 +285,12 @@ export default {
       wx.ready(function() {
         //需在用户可能点击分享按钮前就先调用
         wx.updateAppMessageShareData({
-          title: "大爷来玩啊", // 分享标题
-          desc: "大转盘啊", // 分享描述
+          title: "来玩啊", // 分享标题
+          desc: "大转盘", // 分享描述
           link: "http://www.baidu.com", // 分享链接，该链接域名或路径必须与当前页面对应的公众号JS安全域名一致
           imgUrl: "", // 分享图标
           success: function() {
             // 设置成功
-            console.log("大爷再来啊");
           }
         });
       });
@@ -306,11 +306,10 @@ export default {
           this.componey = res.data.componey;
           this.contact = res.data.contact;
           let { data } = res.data;
-          console.log(data);
           // 红包
           this.showRedPackets = !data.read;
           // 海报
-          this.posterImg = data.img;
+          this.posterImg = data.posterImg;
           // 侧边栏
           this.sideBtnConfig.phone = data.bz_leader_mobile;
           this.sideBtnConfig.music = data.musicfile;
@@ -318,7 +317,6 @@ export default {
           this.boardItems[0].content = data.content;
           // 底部滚动
           this.bottomScrollConfig = [...data.info];
-          console.log(this.bottomScrollConfig);
           // 奖品
           this.rotateItems = [];
           data.prize.forEach(ele => {
@@ -387,7 +385,6 @@ export default {
           id: this.did
         }
       }).then(res => {
-        console.log(res);
         if (res.data.code == "1000") {
           this.changeModal("redPackets");
           this.$bvModal.show("modal-turntable");
@@ -426,7 +423,6 @@ export default {
           id
         }
       }).then(res => {
-        console.log(res);
         if (res.data.code == "1000") {
           this.targetName = res.data.data.prize;
           targetid = res.data.data.prizeid;
@@ -672,6 +668,9 @@ export default {
   .modal-header,
   .modal-footer {
     display: none;
+  }
+  .modal-dialog {
+    margin: 0 !important;
   }
   .modal-content {
     width: auto;

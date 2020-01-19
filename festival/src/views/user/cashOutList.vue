@@ -15,54 +15,25 @@
     </div>
     <div class="content">
       <ul v-show="active">
-        <li>
+        <li v-for="(item, index) in profits" :key="index">
           <div class="item">
             <b-img src="../../assets/images/red-packet.png"></b-img>
             <div class="explain">
               <div class="title">阅读奖励</div>
-              <div class="time">20119.12.05 12:03</div>
+              <div class="time">{{item.createtime}}</div>
             </div>
-            <div class="money">+0.8</div>
-          </div>
-        </li>
-        <li>
-          <div class="item">
-            <b-img src="../../assets/images/red-packet.png"></b-img>
-            <div class="explain">
-              <div class="title">阅读奖励</div>
-              <div class="time">20119.12.05 12:03</div>
-            </div>
-            <div class="money">+0.8</div>
-          </div>
-        </li>
-        <li>
-          <div class="item">
-            <b-img src="../../assets/images/red-packet.png"></b-img>
-            <div class="explain">
-              <div class="title">阅读奖励</div>
-              <div class="time">20119.12.05 12:03</div>
-            </div>
-            <div class="money">+0.8</div>
+            <div class="money">+{{item.money}}</div>
           </div>
         </li>
       </ul>
       <ul v-show="!active">
-        <li>
+        <li v-for="(item, index) in cashOutLog" :key='index'>
           <div class="item">
             <div class="explain">
               <div class="title">提现</div>
-              <div class="time">20119.12.05 12:03</div>
+              <div class="time">{{item.starttime}}</div>
             </div>
-            <div class="money">5元</div>
-          </div>
-        </li>
-        <li>
-          <div class="item">
-            <div class="explain">
-              <div class="title">提现</div>
-              <div class="time">20119.12.05 12:03</div>
-            </div>
-            <div class="money">5元</div>
+            <div class="money">{{item.money}}元</div>
           </div>
         </li>
       </ul>
@@ -75,10 +46,37 @@ export default {
   name: "cashOutList",
   data() {
     return {
-      active: true
+      active: true,
+      profits: [],
+      cashOutLog: []
     };
   },
+  methods: {
+    init () {
+      this.$axios({
+      url: '/api/activity/userinfo/read',
+      method: 'post',
+    }).then(res =>{
+      // console.log(res)
+      if (res.data.code == '1000') {
+        let data = res.data.data
+        this.profits = data;
+      }
+    })
+    this.$axios({
+      url: '/api/activity/userinfo/readlog',
+      method: 'post',
+    }).then(res =>{
+      // console.log(res)
+      if (res.data.code == '1000') {
+        let data = res.data.data
+        this.cashOutLog = data;
+      }
+    })
+    }
+  },
   mounted () {
+    this.init()
   }
 };
 </script>
