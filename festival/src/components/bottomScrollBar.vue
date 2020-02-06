@@ -56,6 +56,7 @@ export default {
     }, 2000);
   },
   destroyed() {
+    // 清除定时器
     clearInterval(this.timeId);
   }
 };

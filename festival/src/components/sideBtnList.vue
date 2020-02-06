@@ -30,6 +30,7 @@ export default {
   },
   props: ['config'],
   methods: {
+    // 暂停和开始音乐
     stopMusic() {
       if (this.music.paused) {
         this.music.play();

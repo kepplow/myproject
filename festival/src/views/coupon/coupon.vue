@@ -103,6 +103,7 @@ export default {
   name: "coupon",
   data() {
     return {
+      // 地图配置
       mapConfig: {
         center: { lng: 109.45744048529967, lat: 36.49771311230842 },
         zoom: 13,
@@ -175,6 +176,7 @@ export default {
     redPackets
   },
   methods: {
+    // 去支付
     gopay(id) {
       let that = this;
       this.$axios({
@@ -218,12 +220,14 @@ export default {
         }
       });
     },
+    // 去百度地图搜索
     gotoMap() {
       location.href = `http://api.map.baidu.com/marker?location=${this.mapConfig
         .center.lng || 0},${this.mapConfig.center.lat ||
         0}&title=我在这&content=${this.mapConfig.center.bz_name}&output=html`;
     },
     mapReady({ BMap, map }) {
+      // 设置地图中心点
       var point = new BMap.Point(
         this.mapConfig.center.lng,
         this.mapConfig.center.lat
@@ -300,6 +304,7 @@ export default {
       }
       this.$bvModal.show("modal-coupon");
     },
+    // 展示表单
     showForm(id) {
       this.changeModal("userInfo");
       this.$bvModal.show("modal-coupon");
@@ -316,6 +321,7 @@ export default {
     this.init();
   },
   beforeMount() {
+    // 对接微信api
     this.$axios({
       method: "post",
       url: "/api/activity/userinfo/js",

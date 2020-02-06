@@ -52,6 +52,7 @@ export default {
     };
   },
   methods: {
+    // 初始化数据
     init () {
       this.$axios({
       url: '/api/activity/userinfo/read',

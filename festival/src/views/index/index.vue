@@ -117,6 +117,7 @@ export default {
   data() {
     return {
       did: "",
+      // 地图配置 center：中心点经纬度坐标， zoom 缩放级别
       mapConfig: {
         center: { lng: 0, lat: 0 },
         zoom: 13
@@ -190,6 +191,7 @@ export default {
     redPackets
   },
   methods: {
+    // 去支付
     goPay() {
       let that = this;
       this.$axios({
@@ -234,6 +236,7 @@ export default {
         }
       });
     },
+    // 去百度地图搜索
     gotoMap() {
       location.href = `http://api.map.baidu.com/marker?location=${this.mapConfig
         .center.lng || 0},${this.mapConfig.center.lat ||
@@ -241,6 +244,7 @@ export default {
     },
     // 初始化地图
     mapReady({ BMap, map }) {
+      // 设置地图中心点
       var point = new BMap.Point(
         this.mapConfig.center.lng,
         this.mapConfig.center.lat
@@ -267,10 +271,12 @@ export default {
       this.$bvModal.show("modal-index");
       this.showRedPackets = false;
     },
+    // 展示海报
     showPoser() {
       this.changeModal("poster");
       this.$bvModal.show("modal-index");
     },
+    // 显示表单
     showForm() {
       this.changeModal("userInfo");
       this.$bvModal.show("modal-index");
@@ -290,6 +296,7 @@ export default {
       }
       this.modalsVisible[target] = true;
     },
+    // 初始化数据
     initData() {
       this.submitForm.id = this.did =
         this.$route.query && this.$route.query.id ? this.$route.query.id : "";
@@ -348,6 +355,7 @@ export default {
     this.initData();
   },
   beforeMount() {
+    // 对接微信api
     this.$axios({
       method: "post",
       url: "/api/activity/userinfo/js",

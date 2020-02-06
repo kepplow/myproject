@@ -22,10 +22,11 @@ export default {
   name: "myPrize",
   data() {
     return {
-      prizeList: []
+      prizeList: [] // 奖品列表
     };
   },
   mounted () {
+    // 获取奖品列表
     this.$axios({
       methed: 'get',
       url: 'api/activity/userinfo/myprize'

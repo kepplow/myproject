@@ -41,7 +41,8 @@ export default {
   },
   props: ["config"],
   mounted() {
-    this.lastTime = this.config.deadline;
+    // 计算截止日期到现在的总计时
+    this.lastTime = this.config.deadline; // 设置截止日期
     const day = 1000 * 60 * 60 * 24;
     const now = new Date().getTime();
     this.timeDown.day = (this.lastTime - now) / day;
@@ -54,6 +55,7 @@ export default {
         .slice(0, 2)
         .replace(".", "");
     }
+    // 每隔一秒改变数据
     this.timer = setInterval(() => {
       if (this.timeDown.second <= 0) {
         if (this.timeDown.minutes <= 0) {
@@ -76,6 +78,7 @@ export default {
     }, 1000);
   },
   beforeDestroy() {
+    // 清除定时器
     clearInterval(this.timer);
     this.timer = null;
   }

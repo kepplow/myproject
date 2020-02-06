@@ -30,8 +30,10 @@ export default {
     };
   },
   methods: {
+    // 数据初始化
     init() {
       let that = this;
+      // 根据路由所带参数不同 请求不同数据源
       if (this.$route.query.type == "0") {
         this.$axios({
           url: "api/activity/userinfo/orderinf",

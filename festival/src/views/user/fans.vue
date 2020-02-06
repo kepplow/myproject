@@ -3,7 +3,7 @@
     <div class="header">
       <div class="bg-box">
         <div class="title">拓展记录</div>
-        <div class="count">100</div>
+        <div class="count">count</div>
       </div>
     </div>
     <div class="content">
@@ -25,10 +25,12 @@ export default {
   name: "fans",
   data() {
     return {
-      fans: []
+      fans: [],
+      count: ''
     };
   },
   methods: {
+    // 数据初始化
     init () {
       this.$axios({
         url: '/api/activity/userinfo/refans',
@@ -38,6 +40,7 @@ export default {
         if (res.data.code == '1000') {
           let data = res.data.data;
           this.fans = data;
+          this.count = res.data.count;
         }
       })
     }

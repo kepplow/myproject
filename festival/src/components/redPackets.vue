@@ -29,6 +29,7 @@ export default {
     });
   },
   beforeDestroy() {
+    // 清除定时器
     clearInterval(this.timeId);
     this.timeId = null;
   }

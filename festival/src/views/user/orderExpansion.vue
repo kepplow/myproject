@@ -23,6 +23,7 @@ export default {
     };
   },
   methods: {
+    // 数据初始化
     init () {
       this.$axios({
         url: '/api/activity/userinfo/reorders',

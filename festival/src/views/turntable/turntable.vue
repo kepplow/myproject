@@ -166,6 +166,7 @@ export default {
       targetName: "",
       did: null,
       timer: null,
+      // 海报图片
       posterImg: "",
       // 页脚
       componey: { name: "", value: "" },
@@ -243,6 +244,7 @@ export default {
     redPackets
   },
   beforeMount() {
+    // 对接微信api
     let id =
       this.$route.query && this.$route.query.id ? this.$route.query.id : 0;
     this.$axios({
@@ -276,10 +278,12 @@ export default {
     this.init();
   },
   beforeDestroy() {
+    // 清除定时器
     clearInterval(this.timer);
     this.timer = null;
   },
   methods: {
+    // 初始化数据
     init() {
       this.did = this.$route.query.did || null;
       wx.ready(function() {
@@ -392,6 +396,7 @@ export default {
         }
       });
     },
+    // 生成转盘canvas
     craetCanvas() {
       this.rotateItems.forEach((ele, index) => {
         let ctx = this.$refs["cs-turntable-" + index][0].getContext("2d");
@@ -454,6 +459,7 @@ export default {
         }
       });
     },
+    // 结束旋转
     rotateEnd() {
       let plate = this.$refs.plate;
       // 重置转盘角度
@@ -465,10 +471,12 @@ export default {
       this.changeModal("prize");
       this.$bvModal.show("modal-turntable");
     },
+    // 展示海报
     showPoser() {
       this.changeModal("poster");
       this.$bvModal.show("modal-turntable");
     },
+    // 展示表单
     showForm() {
       this.changeModal("userInfo");
       this.$bvModal.show("modal-turntable");

@@ -53,17 +53,21 @@ export default {
     };
   },
   computed: {
+    // 服务费
     service() {
       return (this.count / 500).toFixed(2);
     },
+    // 到账金额
     actual() {
       return (this.count - (this.count / 500).toFixed(2)).toFixed(2);
     },
+    // 能否提现
     canOut() {
       return this.count > this.all ? false : true;
     }
   },
   methods: {
+    // 发送提现请求
     cashOut() {
       this.$axios({
         url: "/api/activity/userinfo/apply",

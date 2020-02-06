@@ -83,6 +83,7 @@ export default {
     };
   },
   beforeMount() {
+    // 获取用户头像和用户名
     this.$axios({
       method: "POST",
       url: `/api/activity/userinfo/user`
