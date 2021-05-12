@@ -35,7 +35,7 @@
     "popper.js": "^1.15.0",
     "portal-vue": "^2.1.4",
     "sass-loader": "^7.1.0",
-    "swiper": "^5.2.0",
+    "swiper": "^6.5.1",
     "vue-cli-plugin-bootstrap-vue": "^0.5.0",
     "vue-template-compiler": "^2.6.10",
     "weixin-js-sdk": "^1.4.0-test"
